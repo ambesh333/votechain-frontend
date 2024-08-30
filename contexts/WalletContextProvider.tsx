@@ -21,13 +21,13 @@ import { useWallet } from "@solana/wallet-adapter-react";
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   // const network = WalletAdapterNetwork.Devnet;
-  const network = WalletAdapterNetwork.Mainnet;
+  const network = WalletAdapterNetwork.Testnet;
   // const endpoint =
   //   "https://devnet.helius-rpc.com/?api-key=79eba147-fb40-4cb4-93fa-4b810b43b0ab";
 
   // You can also provide a custom RPC endpoint.
   // const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-  const endpoint = "https://api.mainnet-beta.solana.com";
+  const endpoint = "https://api.testnet.solana.com";
   //initiate auto connect
   const { autoConnect } = useWallet();
 
