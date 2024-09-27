@@ -251,3 +251,108 @@ const CreateEvent = () => {
 };
 
 export default CreateEvent;
+
+// 'use client'
+
+// import { useState } from 'react'
+// import { XIcon, PlusCircleIcon } from 'lucide-react'
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+// import { Textarea } from "@/components/ui/textarea"
+
+// export function CreateEventForm() {
+//   const [isDialogOpen, setIsDialogOpen] = useState(false)
+//   const [eventImage, setEventImage] = useState('/placeholder.svg?height=100&width=100')
+
+//   const openDialog = () => setIsDialogOpen(true)
+//   const closeDialog = () => setIsDialogOpen(false)
+
+//   return (
+//     <>
+//       <button
+//         onClick={openDialog}
+//         className="bg-[#98ECFF] text-black font-semibold py-2 px-4 hover:bg-[#7DCEE0] transition-colors"
+//       >
+//         Create Event
+//       </button>
+
+//       {isDialogOpen && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//           <div className="bg-[#09090B] border border-[#98ECFF] p-6 max-w-md w-full relative">
+//             <button
+//               className="absolute top-2 right-2 text-gray-400 hover:text-white"
+//               onClick={closeDialog}
+//             >
+//               <XIcon className="w-6 h-6" />
+//             </button>
+
+//             <div className="flex items-center justify-center mb-6">
+//               <div className="relative">
+//                 <img
+//                   src={eventImage}
+//                   alt="Event"
+//                   className="w-24 h-24 rounded-full object-cover"
+//                 />
+//                 <button
+//                   className="absolute bottom-0 right-0 bg-[#98ECFF] rounded-full p-1"
+//                   onClick={() => {/* TODO: Implement image upload */}}
+//                 >
+//                   <PlusCircleIcon className="w-6 h-6 text-black" />
+//                 </button>
+//               </div>
+//             </div>
+
+//             <form className="space-y-4">
+//               <div>
+//                 <Label htmlFor="eventTitle">Event Title</Label>
+//                 <Input id="eventTitle" placeholder="Enter event title" className="bg-gray-800 border-gray-700 text-white" />
+//               </div>
+
+//               <div>
+//                 <Label htmlFor="eventDescription">Description</Label>
+//                 <Textarea id="eventDescription" placeholder="Enter event description" className="bg-gray-800 border-gray-700 text-white" />
+//               </div>
+
+//               <div className="grid grid-cols-2 gap-4">
+//                 <div>
+//                   <Label htmlFor="startDate">Start Date</Label>
+//                   <Input id="startDate" type="date" className="bg-gray-800 border-gray-700 text-white" />
+//                 </div>
+//                 <div>
+//                   <Label htmlFor="endDate">End Date</Label>
+//                   <Input id="endDate" type="date" className="bg-gray-800 border-gray-700 text-white" />
+//                 </div>
+//               </div>
+
+//               <div>
+//                 <Label htmlFor="invitedWallets">Invited Wallets</Label>
+//                 <Input id="invitedWallets" placeholder="Enter wallet addresses" className="bg-gray-800 border-gray-700 text-white" />
+//               </div>
+
+//               <div>
+//                 <Label htmlFor="votingOptions">Voting Options</Label>
+//                 <Textarea id="votingOptions" placeholder="Enter voting options (one per line)" className="bg-gray-800 border-gray-700 text-white" />
+//               </div>
+
+//               <div className="flex justify-end space-x-4">
+//                 <button
+//                   type="button"
+//                   onClick={closeDialog}
+//                   className="px-4 py-2 border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   type="submit"
+//                   className="px-4 py-2 bg-[#98ECFF] text-black font-semibold hover:bg-[#7DCEE0] transition-colors"
+//                 >
+//                   Create Event
+//                 </button>
+//               </div>
+//             </form>
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   )
+// }

@@ -18,7 +18,7 @@ export default function Component() {
             <CreateEvent />
             <div className="space-y-6">
               <ActiveEvent />
-              <PastEvent />
+              {/* <PastEvent /> */}
             </div>
           </div>
         </>

@@ -58,37 +58,39 @@ const PastVote = () => {
   console.log("pastEvent", events);
 
   return (
-    <div className="bg-background rounded-lg shadow-sm border border-input p-6 space-y-4">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Past Voting Events</h2>
-        <p className="text-muted-foreground">
-          Events that have completed voting.
-        </p>
+    <main className="container mx-auto px-4 py-8">
+      <div className="bg-[#09090B] border border-gray-800 p-6 mb-8">
+        <h2 className="text-[#98ECFF] text-2xl font-bold mb-6">
+          Past Voting Events
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {events.map((event) => (
+            //@ts-ignore
+            <Card key={event.id}>
+              <CardContent className="flex flex-col items-start justify-between gap-4 p-6">
+                <div>
+                  <h3 className="text-lg font-semibold">{event.title}</h3>
+                  <p className="text-muted-foreground">{event.description}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-muted-foreground">
+                    {new Date(event.startDate).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-primary">
+                  <Check className="h-5 w-5" />
+                  <span>Voted</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span>Invited Users: </span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {events.map((event) => (
-          //@ts-ignore
-          <Card key={event.id}>
-            <CardContent className="flex flex-col items-start justify-between gap-4 p-6">
-              <div>
-                <h3 className="text-lg font-semibold">{event.title}</h3>
-                <p className="text-muted-foreground">{event.description}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <span className="text-muted-foreground">
-                  {new Date(event.startDate).toLocaleDateString()}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-primary">
-                <Check className="h-5 w-5" />
-                <span>Voted</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+    </main>
   );
 };
 

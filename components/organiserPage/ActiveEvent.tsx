@@ -55,35 +55,32 @@ const ActiveEvent = () => {
   }, []);
 
   return (
-    <div className="bg-background rounded-lg shadow-sm border border-input space-y-4 px-2">
-      <div className="space-y-2 p-3">
-        <h2 className="text-2xl font-bold">Active Voting Events</h2>
+    <main className="container mx-auto px-4 py-8">
+      <div className="bg-[#09090B] border border-gray-800 p-6 mb-8">
+        <h2 className="text-[#98ECFF] text-2xl font-bold mb-6">
+          Active Voting Events
+        </h2>
         <p className="text-muted-foreground">
           Events that are currently open for voting.
         </p>
-      </div>
-
-      <div className="flex justify-center items-center w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-h-80 overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {events.map((event) => (
             <CardComponent
               key={event.id}
               id={event.id}
               description={event.description}
               title={event.title}
-              categories={event.invitedUsers.map(
-                (user) => `${user.slice(0, 6)}...${user.slice(-4)}`
-              )}
+              categories={event.invitedUsers}
               participants={event.invitedUsers.length.toString()}
               startDate={new Date(event.startDate).toLocaleDateString()}
               endDate={new Date(event.endDate).toLocaleDateString()}
-              entity="organizer"
               options={event.options}
+              entity="voter"
             />
           ))}
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
