@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import Jazzicon from "react-jazzicon";
-// import Cookies from "js-cookie";
 import { useWalletContext } from "@/contexts/WalletContext";
 import axios from "axios";
 
@@ -86,7 +85,10 @@ const WalletConnection = () => {
           {!connected ? (
             <>
               <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  className="rounded-none border-blue-500"
+                >
                   <LogInIcon className="mr-2 h-4 w-4" />
                   {connecting ? "connecting..." : "Connect Wallet"}
                 </Button>
@@ -95,7 +97,10 @@ const WalletConnection = () => {
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  className="rounded-none border-[#98ECFF]"
+                >
                   <div className="flex items-center gap-2">
                     <Jazzicon
                       diameter={25}
@@ -110,7 +115,10 @@ const WalletConnection = () => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="w-[240px]">
+              <DropdownMenuContent
+                align="end"
+                className="w-[240px] rounded-none border-white"
+              >
                 <div className="flex flex-col gap-2 p-4">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-medium">SOL Balance</div>
@@ -124,7 +132,11 @@ const WalletConnection = () => {
                     )}
                   </div>
                   <Separator />
-                  <Button variant="destructive" onClick={handleDisconnect}>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDisconnect}
+                    className="rounded-none"
+                  >
                     Disconnect
                   </Button>
                 </div>
@@ -132,34 +144,33 @@ const WalletConnection = () => {
             </DropdownMenu>
           )}
 
-          <DialogContent
-            className="max-w-[450px] bg-black"
-            style={{
-              borderRadius: "30px",
-            }}
-          >
+          <DialogContent className="max-w-[450px] bg-black rounded-none border-[#98ECFF]">
             <div className="flex w-full justify-center items-center">
-              <div className="flex flex-col justify-start items-center space-y-5 w-[300px] md:w-[400px] overflow-y-auto">
+              <div className="flex flex-col justify-start items-center space-y-5 w-[300px] md:w-[400px] overflow-y-auto  p-4 rounded-none">
                 {wallets.map((wallet) => (
-                  <Button
+                  <div
                     key={wallet.adapter.name}
-                    onClick={() => handleWalletSelect(wallet.adapter.name)}
-                    variant={"ghost"}
-                    className="h-[40px] hover:bg-transparent hover:text-white text-[20px] text-white font-slackey flex w-full justify-center items-center"
+                    className="bg-transparent border border-white p-2 mb-2 w-full"
                   >
-                    <div className="flex">
-                      <Image
-                        src={wallet.adapter.icon}
-                        alt={wallet.adapter.name}
-                        height={30}
-                        width={30}
-                        className="mr-5"
-                      />
-                    </div>
-                    <div className="font-slackey text-white wallet-name text-[20px]">
-                      {wallet.adapter.name}
-                    </div>
-                  </Button>
+                    <Button
+                      onClick={() => handleWalletSelect(wallet.adapter.name)}
+                      variant={"ghost"}
+                      className="h-[60px] hover:bg-transparent hover:text-white text-[20px] text-white font-slackey flex w-full justify-between items-center px-4"
+                    >
+                      <div className="flex items-center">
+                        <Image
+                          src={wallet.adapter.icon}
+                          alt={wallet.adapter.name}
+                          height={30}
+                          width={30}
+                          className="mr-4"
+                        />
+                        <div className="font-slackey text-white wallet-name text-[20px] truncate">
+                          {wallet.adapter.name}
+                        </div>
+                      </div>
+                    </Button>
+                  </div>
                 ))}
               </div>
             </div>

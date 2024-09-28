@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { CardComponent } from "../voterPage/Card";
 import axios from "axios";
 import { BACKEND_URL } from "@/utils";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
+import { AlertCircle, VoteIcon } from "lucide-react";
+import Link from "next/link";
 
 interface Event {
   id: number;
@@ -25,7 +26,6 @@ interface Event {
 
 const ActiveEvent = () => {
   const { toast } = useToast();
-
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
@@ -52,37 +52,46 @@ const ActiveEvent = () => {
     };
 
     fetchActiveEvents();
-  }, []);
+  }, [toast]);
 
   return (
-    <div className="bg-background rounded-lg shadow-sm border border-input space-y-4 px-2">
-      <div className="space-y-2 p-3">
-        <h2 className="text-2xl font-bold">Active Voting Events</h2>
-        <p className="text-muted-foreground">
-          Events that are currently open for voting.
-        </p>
-      </div>
-
-      <div className="flex justify-center items-center w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-h-80 overflow-y-auto">
+    <div>
+      {events.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-[#1A1A1A] border-2 border-dashed border-gray-700 rounded-lg">
+          <AlertCircle className="w-16 h-16 text-yellow-500 mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">
+            No Active Events
+          </h3>
+          <p className="text-gray-400 mb-6">
+            You haven&apos;t created any active voting events yet.
+          </p>
+          <VoteIcon className="w-24 h-24 text-[#98ECFF] mb-6" />
+          <p className="text-gray-300 mb-4">
+            Ready to start a new voting event? Use the form on the left to
+            create one!
+          </p>
+          <Link href="/about" className="text-[#98ECFF] hover:underline">
+            Learn more about creating events
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {events.map((event) => (
             <CardComponent
               key={event.id}
               id={event.id}
               description={event.description}
               title={event.title}
-              categories={event.invitedUsers.map(
-                (user) => `${user.slice(0, 6)}...${user.slice(-4)}`
-              )}
+              categories={event.invitedUsers}
               participants={event.invitedUsers.length.toString()}
               startDate={new Date(event.startDate).toLocaleDateString()}
               endDate={new Date(event.endDate).toLocaleDateString()}
-              entity="organizer"
               options={event.options}
+              entity="organiser"
             />
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 };

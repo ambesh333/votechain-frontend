@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DatePickerDemo } from "./DatePicker";
-import { TabsDemo } from "./Tab";
+import { X } from "lucide-react";
 import axios from "axios";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
@@ -13,7 +13,6 @@ import { BACKEND_URL } from "@/utils";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 
-// Define validation schema using Zod
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string(),
@@ -24,7 +23,13 @@ const eventSchema = z.object({
     message: "Invalid end date",
   }),
   options: z.array(z.string()).min(1, "At least one option is required"),
-  invitedUsers: z.array(z.string()).optional(),
+  invitedUsers: z
+    .array(
+      z
+        .string()
+        .regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/, "Invalid Solana wallet address")
+    )
+    .optional(),
 });
 
 const CreateEvent = () => {
@@ -33,20 +38,22 @@ const CreateEvent = () => {
     description: "",
     startDate: null as Date | null,
     endDate: null as Date | null,
-    options: [""],
+    options: [] as string[],
     invitedUsers: [] as string[],
   };
+
   const [formState, setFormState] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareableLink, setShareableLink] = useState<string | null>(null);
+  const [newOption, setNewOption] = useState("");
+  const [newAddress, setNewAddress] = useState("");
 
   const { title, description, startDate, endDate, options, invitedUsers } =
     formState;
 
   const { toast } = useToast();
 
-  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     field: keyof typeof formState
@@ -54,15 +61,11 @@ const CreateEvent = () => {
     setFormState({ ...formState, [field]: e.target.value });
   };
 
-  const handleOptionChange = (index: number, value: string) => {
-    const updatedOptions = options.map((option, i) =>
-      i === index ? value : option
-    );
-    setFormState({ ...formState, options: updatedOptions });
-  };
-
   const addOption = () => {
-    setFormState({ ...formState, options: [...options, ""] });
+    if (newOption.trim()) {
+      setFormState({ ...formState, options: [...options, newOption.trim()] });
+      setNewOption("");
+    }
   };
 
   const removeOption = (index: number) => {
@@ -70,8 +73,25 @@ const CreateEvent = () => {
     setFormState({ ...formState, options: updatedOptions });
   };
 
+  // Add new address to invitedUsers array
   const addAddress = () => {
-    setFormState({ ...formState, invitedUsers: [...invitedUsers, ""] });
+    if (newAddress.trim()) {
+      const solanaWalletRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      if (solanaWalletRegex.test(newAddress.trim())) {
+        setFormState({
+          ...formState,
+          invitedUsers: [...invitedUsers, newAddress.trim()],
+        });
+        setNewAddress("");
+      } else {
+        toast({
+          title: "Invalid Wallet Address",
+          description: "Please enter a valid Solana wallet address.",
+          className: "border border-red-500",
+          action: <ToastAction altText="Close">Close</ToastAction>,
+        });
+      }
+    }
   };
 
   const removeAddress = (index: number) => {
@@ -85,11 +105,15 @@ const CreateEvent = () => {
     );
     setFormState({ ...formState, invitedUsers: updatedInvitedUsers });
   };
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 4)}....${address.slice(-3)}`;
+  };
 
   const resetForm = () => {
     setFormState(initialState);
   };
 
+  // Submit form data
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
@@ -114,7 +138,6 @@ const CreateEvent = () => {
         }
       );
 
-      console.log("Event created:", response.data);
       toast({
         title: "Event Created",
         description: `Your event was successfully created.`,
@@ -154,10 +177,20 @@ const CreateEvent = () => {
     }
   };
 
-  console.log(formState);
+  const handleOptionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addOption();
+    }
+  };
+
+  const handleAddressKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addAddress();
+    }
+  };
 
   return (
-    <div className="bg-background rounded-lg shadow-sm border border-input p-6 space-y-6">
+    <div className="bg-background rounded-none shadow-sm border border-input p-6 space-y-6">
       <header className="space-y-2">
         <h2 className="text-2xl font-bold">Create Event</h2>
         <p className="text-muted-foreground">
@@ -175,16 +208,18 @@ const CreateEvent = () => {
             value={title}
             onChange={(e) => handleInputChange(e, "title")}
             placeholder="What should we build next?"
+            className="rounded-none"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title">Description</Label>
+          <Label htmlFor="description">Description</Label>
           <Input
-            id="title"
+            id="description"
             value={description}
             onChange={(e) => handleInputChange(e, "description")}
-            placeholder="Describe your title"
+            placeholder="Describe your event"
+            className="rounded-none"
           />
         </div>
 
@@ -211,40 +246,96 @@ const CreateEvent = () => {
 
         <div className="space-y-2">
           <Label htmlFor="options">Options</Label>
-          {options.map((option, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Input
-                id={`option-${index}`}
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                placeholder={`Option ${index + 1}`}
-              />
-              {index > 0 && (
-                <Button
-                  variant="destructive"
+          <div className="flex items-center space-x-2">
+            <Input
+              id="new-option"
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              onKeyDown={handleOptionKeyDown}
+              placeholder="Add an option"
+              className="rounded-none"
+            />
+            <Button
+              variant="outline"
+              onClick={addOption}
+              className="rounded-none"
+            >
+              Add Option
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {options.map((option, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-1  px-2 py-1 rounded-full"
+              >
+                <span>{option}</span>
+                <X
+                  className="w-4 h-4 cursor-pointer"
                   onClick={() => removeOption(index)}
-                >
-                  Remove
-                </Button>
-              )}
-            </div>
-          ))}
-          <Button variant="outline" onClick={addOption}>
-            Add Option
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Invited Wallet Addresses Section */}
+        <div className="space-y-2">
+          <Label htmlFor="wallet-address">Invited Wallet Addresses</Label>
+          <div className="flex items-center space-x-2">
+            <Input
+              id="wallet-address"
+              value={newAddress}
+              onChange={(e) => setNewAddress(e.target.value)}
+              onKeyDown={handleAddressKeyDown} // Add this line
+              placeholder="Enter Solana wallet address"
+              className="rounded-none"
+            />
+            <Button
+              variant="outline"
+              onClick={addAddress}
+              className="rounded-none"
+            >
+              Add Address
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {invitedUsers.map((address, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-1 px-2 py-1 rounded-full"
+              >
+                <span>{truncateAddress(address)}</span>
+                <X
+                  className="w-4 h-4 cursor-pointer"
+                  onClick={() => removeAddress(index)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="rounded-none w-full"
+          >
+            {loading ? "Submitting..." : "Create Event"}
           </Button>
         </div>
 
-        <TabsDemo
-          invitedUsers={invitedUsers}
-          addAdress={addAddress}
-          removeAddress={removeAddress}
-          handleinvitedUserChange={handleInvitedUserChange}
-          shareableLink={shareableLink}
-        />
-
-        <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-          {loading ? "Creating..." : "Create Event"}
-        </Button>
+        {/* {shareableLink && (
+          <div className="mt-4">
+            <Label htmlFor="shareable-link">Shareable Link</Label>
+            <Input
+              id="shareable-link"
+              value={shareableLink}
+              readOnly
+              className="rounded-none"
+            />
+          </div>
+        )} */}
       </div>
     </div>
   );

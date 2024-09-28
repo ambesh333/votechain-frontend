@@ -1,13 +1,5 @@
 "use client";
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -16,6 +8,7 @@ import { ToastAction } from "@/components/ui/toast";
 import axios from "axios";
 import { BACKEND_URL } from "@/utils";
 import { useWalletContext } from "@/contexts/WalletContext";
+import { XIcon, AlertCircle } from "lucide-react";
 
 interface VotingDialogProps {
   eventId: number;
@@ -44,8 +37,15 @@ const VotingDialog: React.FC<VotingDialogProps> = ({
   options,
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [isVotingOpen, setIsVotingOpen] = useState<boolean>(true);
   const { toast } = useToast();
   const { publicKey } = useWalletContext();
+
+  useEffect(() => {
+    const now = new Date();
+    const end = new Date(endDate);
+    setIsVotingOpen(now < end);
+  }, [endDate]);
 
   const handleVote = async () => {
     if (selectedOption !== null) {
@@ -67,7 +67,7 @@ const VotingDialog: React.FC<VotingDialogProps> = ({
           action: <ToastAction altText="Close">Close</ToastAction>,
         });
 
-        onClose(); // Close the dialog
+        onClose();
         setSelectedOption(null);
       } catch (error) {
         console.error("Error casting vote:", error);
@@ -81,53 +81,81 @@ const VotingDialog: React.FC<VotingDialogProps> = ({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="start" className="text-right">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-[#09090B] border border-[#98ECFF] p-6 max-w-md w-full relative">
+        <button
+          className="absolute top-2 right-2 text-gray-400 hover:text-white"
+          onClick={onClose}
+        >
+          <XIcon className="w-6 h-6" />
+        </button>
+        <h2 className="text-2xl font-bold text-[ #FFB6C1] mb-4">{title}</h2>
+        <p className="text-gray-300 mb-4">{description}</p>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400">
               Start Date
-            </Label>
-            <span className="col-span-3" id="start">
-              {startDate}
-            </span>
+            </label>
+            <p className="text-white">{startDate}</p>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="end" className="text-right">
+          <div>
+            <label className="block text-sm font-medium text-gray-400">
               End Date
-            </Label>
-            <span className="col-span-3" id="end">
-              {endDate}
-            </span>
+            </label>
+            <p className="text-white">{endDate}</p>
           </div>
-          <RadioGroup
-            value={selectedOption !== null ? selectedOption.toString() : ""}
-            onValueChange={(value) => setSelectedOption(Number(value))}
-            className="grid gap-2"
-          >
-            {options.map((option) => (
-              <div key={option.id} className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={option.id.toString()}
-                  id={`option-${option.id}`}
-                />
-                <Label htmlFor={`option-${option.id}`}>{option.option}</Label>
-              </div>
-            ))}
-          </RadioGroup>
         </div>
-        <DialogFooter>
-          <Button onClick={handleVote} disabled={selectedOption === null}>
-            Vote
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        {isVotingOpen ? (
+          <>
+            <div className="mb-6 border-2 border-white p-4">
+              <label className="block text-sm font-medium text-gray-400 mb-2">
+                Options
+              </label>
+              <RadioGroup
+                value={selectedOption !== null ? selectedOption.toString() : ""}
+                onValueChange={(value) => setSelectedOption(Number(value))}
+              >
+                {options.map((option) => (
+                  <div
+                    key={option.id}
+                    className="flex items-center space-x-2 mb-2"
+                  >
+                    <RadioGroupItem
+                      value={option.id.toString()}
+                      id={`option-${option.id}`}
+                    />
+                    <Label
+                      htmlFor={`option-${option.id}`}
+                      className="text-white"
+                    >
+                      {option.option}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+            <Button
+              className="w-full bg-[#98ECFF] text-black font-semibold py-2 px-4 hover:bg-[#98ECFF] transition-colors"
+              onClick={handleVote}
+              disabled={selectedOption === null}
+            >
+              Submit Vote
+            </Button>
+          </>
+        ) : (
+          <div className="text-center">
+            <AlertCircle className="mx-auto text-yellow-500 w-12 h-12 mb-4" />
+            <p className="text-yellow-500 font-semibold mb-2">Voting Closed</p>
+            <p className="text-gray-300">
+              The voting period for this event has ended.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
