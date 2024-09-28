@@ -54,6 +54,8 @@ export const CardComponent: React.FC<CardProps> = ({
   const router = useRouter();
   const [isVotingDialogOpen, setVotingDialogOpen] = useState(false);
 
+  console.log("enddate from props", endDate);
+
   const handleButtonClick = () => {
     if (entity === "organiser") {
       router.push(`/organizer/${id}`);
@@ -73,21 +75,37 @@ export const CardComponent: React.FC<CardProps> = ({
     );
   };
 
+  function getCurrentDate() {
+    const date = new Date();
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
   return (
     <div className="relative p-4 border border-gray-800 rounded-lg overflow-hidden">
       <RetroGrid className="absolute inset-0 z-0" />
       <div className="absolute top-4 right-4 z-10">
-        <div
-          className={`flex items-center p-2  ${new Date(endDate) > new Date()}`}
-        >
-          <span
-            className={`h-3 w-3 rounded-full mr-2 ${
-              new Date(endDate) > new Date() ? "bg-green-500" : "bg-red-500"
-            } animate-pulse`}
-          ></span>
-          <span className="text-sm text-white">
-            {new Date(endDate) > new Date() ? "Live" : "Ended"}
-          </span>
+        <div className="flex items-center p-2">
+          {(() => {
+            const now = getCurrentDate();
+            console.log("now date from card", now);
+            console.log("end date from card", endDate);
+            return (
+              <>
+                <span
+                  className={`h-3 w-3 rounded-full mr-2 ${
+                    endDate > now ? "bg-green-500" : "bg-red-500"
+                  } animate-pulse`}
+                ></span>
+                <span className="text-sm text-white">
+                  {endDate > now ? "Live" : "Ended"}
+                </span>
+              </>
+            );
+          })()}
         </div>
       </div>
       <CardHeader className="relative z-10">
