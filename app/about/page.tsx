@@ -49,7 +49,10 @@ export default function Component() {
                 description: "Handles millions of participants with ease",
               },
             ].map((feature, index) => (
-              <Card key={index} className="text-center">
+              <Card
+                key={index}
+                className="text-center bg-transparent border-[#98ECFF]"
+              >
                 <CardHeader>
                   <CardTitle className="flex flex-col items-center">
                     {feature.icon}
@@ -65,7 +68,7 @@ export default function Component() {
         </section>
 
         <section className="mb-16">
-          <Card>
+          <Card className="bg-transparent border-[#98ECFF]">
             <CardHeader>
               <CardTitle className="text-2xl font-semibold">
                 Why Choose VoteChain?
@@ -132,7 +135,7 @@ export default function Component() {
                   "Verify your vote at any time using the blockchain ledger, giving you complete confidence that your voice was heard.",
               },
             ].map((step, index) => (
-              <Card key={index}>
+              <Card key={index} className="bg-transparent border-[#98ECFF]">
                 <CardHeader>
                   <CardTitle>{step.step}</CardTitle>
                 </CardHeader>

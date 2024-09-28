@@ -23,7 +23,6 @@ const truncateString = (str: string, maxLength: number): string => {
   return `${start}...${end}`;
 };
 
-// CardProps interface to type-check the props
 interface CardProps {
   id: number;
   description: string;
@@ -55,9 +54,8 @@ export const CardComponent: React.FC<CardProps> = ({
   const router = useRouter();
   const [isVotingDialogOpen, setVotingDialogOpen] = useState(false);
 
-  // Button click handler for navigating or opening dialog
   const handleButtonClick = () => {
-    if (entity === "organizer") {
+    if (entity === "organiser") {
       router.push(`/organizer/${id}`);
     } else if (entity === "voter") {
       setVotingDialogOpen(true);
@@ -68,7 +66,6 @@ export const CardComponent: React.FC<CardProps> = ({
     setVotingDialogOpen(false);
   };
 
-  // Generate a consistent seed for Jazzicon from the category string
   const generateSeed = (category: string) => {
     return (
       Array.from(category).reduce((acc, char) => acc + char.charCodeAt(0), 0) %
@@ -78,10 +75,7 @@ export const CardComponent: React.FC<CardProps> = ({
 
   return (
     <div className="relative p-4 border border-gray-800 rounded-lg overflow-hidden">
-      {/* RetroGrid as background */}
       <RetroGrid className="absolute inset-0 z-0" />
-
-      {/* Live/Ended Badge */}
       <div className="absolute top-4 right-4 z-10">
         <div
           className={`flex items-center p-2  ${new Date(endDate) > new Date()}`}
@@ -96,32 +90,24 @@ export const CardComponent: React.FC<CardProps> = ({
           </span>
         </div>
       </div>
-
-      {/* Card Header with Title and Description */}
       <CardHeader className="relative z-10">
         <CardTitle className="text-2xl font-bold mb-2 text-white">
           {title}
         </CardTitle>
         <p className="text-gray-400 mb-4">{description}</p>
       </CardHeader>
-
-      {/* Divider */}
       <hr className="border-t border-gray-700 mb-4 relative z-10" />
-
-      {/* Categories (with Jazzicons next to the category name) */}
       <CardContent className="relative z-10">
-        {/* End Date and Participants */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className=" text-white px-3 py-2 text-xs font-medium border border-blue-500 flex items-center w-full">
+        <div className="flex flex-col lg:flex-row gap-4 mb-4">
+          <div className="text-white px-3 py-2 text-xs font-medium border border-[#FFB6C1] flex items-center w-full lg:w-1/2">
             <CalendarIcon className="mr-2 h-4 w-4" />
             ENDS ON: {endDate}
           </div>
-          <div className=" text-white px-3 py-2 text-xs font-medium border border-purple-500 flex items-center w-full">
+          <div className="text-white px-3 py-2 text-xs font-medium border border-[#98FB98] flex items-center w-full lg:w-1/2">
             <UsersIcon className="mr-2 h-4 w-4" />
             PARTICIPANTS: {participants}
           </div>
         </div>
-        {/* Participants Heading */}
         <div className="border-2 border-yellow-400 p-4 ">
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-white mb-2">
@@ -136,34 +122,23 @@ export const CardComponent: React.FC<CardProps> = ({
                 variant="secondary"
                 className="rounded-none border border-gray-500 flex items-center"
               >
-                {/* Jazzicon */}
-                <Jazzicon
-                  diameter={20}
-                  seed={generateSeed(category)}
-                  // className="mr-2"
-                />
-                {/* Truncated Category Name */}
+                <Jazzicon diameter={20} seed={generateSeed(category)} />
+
                 {truncateString(category, 7)}
               </Badge>
             ))}
           </div>
         </div>
-
-        {/* Divider */}
         <hr className="border-t border-gray-700 mb-4 relative z-10" />
       </CardContent>
-
-      {/* Participate/Results Button */}
       <CardFooter className="relative z-10">
         <Button
-          className="w-full bg-[#98ECFF] text-black font-semibold py-3 hover:bg-[#7DCEE0] transition-colors"
+          className="w-full bg-[#98ECFF] text-black font-semibold py-3 hover:bg-[#98ECFF] transition-colors"
           onClick={handleButtonClick}
         >
           {entity === "voter" ? "Participate" : "Results"}
         </Button>
       </CardFooter>
-
-      {/* Voting Dialog (for voter entity) */}
       {entity === "voter" && (
         <VotingDialog
           eventId={id}

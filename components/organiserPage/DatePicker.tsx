@@ -22,7 +22,6 @@ export function DatePickerDemo({
   const [date, setDate] = React.useState<Date | null>(selectedDate || null);
 
   const handleSelectDate = (selectedDate: Date | undefined) => {
-    // Convert `undefined` to `null` to maintain compatibility with your state
     const newDate = selectedDate ?? null;
     setDate(newDate);
     onSelectDate(newDate);

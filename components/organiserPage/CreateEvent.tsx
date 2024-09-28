@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DatePickerDemo } from "./DatePicker";
-import { TabsDemo } from "./Tab";
+import { X } from "lucide-react";
 import axios from "axios";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
@@ -13,7 +13,6 @@ import { BACKEND_URL } from "@/utils";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 
-// Define validation schema using Zod
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string(),
@@ -24,7 +23,13 @@ const eventSchema = z.object({
     message: "Invalid end date",
   }),
   options: z.array(z.string()).min(1, "At least one option is required"),
-  invitedUsers: z.array(z.string()).optional(),
+  invitedUsers: z
+    .array(
+      z
+        .string()
+        .regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/, "Invalid Solana wallet address")
+    )
+    .optional(),
 });
 
 const CreateEvent = () => {
@@ -33,20 +38,22 @@ const CreateEvent = () => {
     description: "",
     startDate: null as Date | null,
     endDate: null as Date | null,
-    options: [""],
+    options: [] as string[],
     invitedUsers: [] as string[],
   };
+
   const [formState, setFormState] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareableLink, setShareableLink] = useState<string | null>(null);
+  const [newOption, setNewOption] = useState("");
+  const [newAddress, setNewAddress] = useState("");
 
   const { title, description, startDate, endDate, options, invitedUsers } =
     formState;
 
   const { toast } = useToast();
 
-  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     field: keyof typeof formState
@@ -54,15 +61,11 @@ const CreateEvent = () => {
     setFormState({ ...formState, [field]: e.target.value });
   };
 
-  const handleOptionChange = (index: number, value: string) => {
-    const updatedOptions = options.map((option, i) =>
-      i === index ? value : option
-    );
-    setFormState({ ...formState, options: updatedOptions });
-  };
-
   const addOption = () => {
-    setFormState({ ...formState, options: [...options, ""] });
+    if (newOption.trim()) {
+      setFormState({ ...formState, options: [...options, newOption.trim()] });
+      setNewOption("");
+    }
   };
 
   const removeOption = (index: number) => {
@@ -70,8 +73,25 @@ const CreateEvent = () => {
     setFormState({ ...formState, options: updatedOptions });
   };
 
+  // Add new address to invitedUsers array
   const addAddress = () => {
-    setFormState({ ...formState, invitedUsers: [...invitedUsers, ""] });
+    if (newAddress.trim()) {
+      const solanaWalletRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      if (solanaWalletRegex.test(newAddress.trim())) {
+        setFormState({
+          ...formState,
+          invitedUsers: [...invitedUsers, newAddress.trim()],
+        });
+        setNewAddress("");
+      } else {
+        toast({
+          title: "Invalid Wallet Address",
+          description: "Please enter a valid Solana wallet address.",
+          className: "border border-red-500",
+          action: <ToastAction altText="Close">Close</ToastAction>,
+        });
+      }
+    }
   };
 
   const removeAddress = (index: number) => {
@@ -85,11 +105,15 @@ const CreateEvent = () => {
     );
     setFormState({ ...formState, invitedUsers: updatedInvitedUsers });
   };
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 4)}....${address.slice(-3)}`;
+  };
 
   const resetForm = () => {
     setFormState(initialState);
   };
 
+  // Submit form data
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
@@ -114,7 +138,6 @@ const CreateEvent = () => {
         }
       );
 
-      console.log("Event created:", response.data);
       toast({
         title: "Event Created",
         description: `Your event was successfully created.`,
@@ -154,10 +177,20 @@ const CreateEvent = () => {
     }
   };
 
-  console.log(formState);
+  const handleOptionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addOption();
+    }
+  };
+
+  const handleAddressKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addAddress();
+    }
+  };
 
   return (
-    <div className="bg-background rounded-lg shadow-sm border border-input p-6 space-y-6">
+    <div className="bg-background rounded-none shadow-sm border border-input p-6 space-y-6">
       <header className="space-y-2">
         <h2 className="text-2xl font-bold">Create Event</h2>
         <p className="text-muted-foreground">
@@ -175,16 +208,18 @@ const CreateEvent = () => {
             value={title}
             onChange={(e) => handleInputChange(e, "title")}
             placeholder="What should we build next?"
+            className="rounded-none"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title">Description</Label>
+          <Label htmlFor="description">Description</Label>
           <Input
-            id="title"
+            id="description"
             value={description}
             onChange={(e) => handleInputChange(e, "description")}
-            placeholder="Describe your title"
+            placeholder="Describe your event"
+            className="rounded-none"
           />
         </div>
 
@@ -211,148 +246,99 @@ const CreateEvent = () => {
 
         <div className="space-y-2">
           <Label htmlFor="options">Options</Label>
-          {options.map((option, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Input
-                id={`option-${index}`}
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                placeholder={`Option ${index + 1}`}
-              />
-              {index > 0 && (
-                <Button
-                  variant="destructive"
+          <div className="flex items-center space-x-2">
+            <Input
+              id="new-option"
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              onKeyDown={handleOptionKeyDown}
+              placeholder="Add an option"
+              className="rounded-none"
+            />
+            <Button
+              variant="outline"
+              onClick={addOption}
+              className="rounded-none"
+            >
+              Add Option
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {options.map((option, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-1  px-2 py-1 rounded-full"
+              >
+                <span>{option}</span>
+                <X
+                  className="w-4 h-4 cursor-pointer"
                   onClick={() => removeOption(index)}
-                >
-                  Remove
-                </Button>
-              )}
-            </div>
-          ))}
-          <Button variant="outline" onClick={addOption}>
-            Add Option
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Invited Wallet Addresses Section */}
+        <div className="space-y-2">
+          <Label htmlFor="wallet-address">Invited Wallet Addresses</Label>
+          <div className="flex items-center space-x-2">
+            <Input
+              id="wallet-address"
+              value={newAddress}
+              onChange={(e) => setNewAddress(e.target.value)}
+              onKeyDown={handleAddressKeyDown} // Add this line
+              placeholder="Enter Solana wallet address"
+              className="rounded-none"
+            />
+            <Button
+              variant="outline"
+              onClick={addAddress}
+              className="rounded-none"
+            >
+              Add Address
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {invitedUsers.map((address, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-1 px-2 py-1 rounded-full"
+              >
+                <span>{truncateAddress(address)}</span>
+                <X
+                  className="w-4 h-4 cursor-pointer"
+                  onClick={() => removeAddress(index)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="rounded-none w-full"
+          >
+            {loading ? "Submitting..." : "Create Event"}
           </Button>
         </div>
 
-        <TabsDemo
-          invitedUsers={invitedUsers}
-          addAdress={addAddress}
-          removeAddress={removeAddress}
-          handleinvitedUserChange={handleInvitedUserChange}
-          shareableLink={shareableLink}
-        />
-
-        <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-          {loading ? "Creating..." : "Create Event"}
-        </Button>
+        {/* {shareableLink && (
+          <div className="mt-4">
+            <Label htmlFor="shareable-link">Shareable Link</Label>
+            <Input
+              id="shareable-link"
+              value={shareableLink}
+              readOnly
+              className="rounded-none"
+            />
+          </div>
+        )} */}
       </div>
     </div>
   );
 };
 
 export default CreateEvent;
-
-// 'use client'
-
-// import { useState } from 'react'
-// import { XIcon, PlusCircleIcon } from 'lucide-react'
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-// import { Textarea } from "@/components/ui/textarea"
-
-// export function CreateEventForm() {
-//   const [isDialogOpen, setIsDialogOpen] = useState(false)
-//   const [eventImage, setEventImage] = useState('/placeholder.svg?height=100&width=100')
-
-//   const openDialog = () => setIsDialogOpen(true)
-//   const closeDialog = () => setIsDialogOpen(false)
-
-//   return (
-//     <>
-//       <button
-//         onClick={openDialog}
-//         className="bg-[#98ECFF] text-black font-semibold py-2 px-4 hover:bg-[#7DCEE0] transition-colors"
-//       >
-//         Create Event
-//       </button>
-
-//       {isDialogOpen && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//           <div className="bg-[#09090B] border border-[#98ECFF] p-6 max-w-md w-full relative">
-//             <button
-//               className="absolute top-2 right-2 text-gray-400 hover:text-white"
-//               onClick={closeDialog}
-//             >
-//               <XIcon className="w-6 h-6" />
-//             </button>
-
-//             <div className="flex items-center justify-center mb-6">
-//               <div className="relative">
-//                 <img
-//                   src={eventImage}
-//                   alt="Event"
-//                   className="w-24 h-24 rounded-full object-cover"
-//                 />
-//                 <button
-//                   className="absolute bottom-0 right-0 bg-[#98ECFF] rounded-full p-1"
-//                   onClick={() => {/* TODO: Implement image upload */}}
-//                 >
-//                   <PlusCircleIcon className="w-6 h-6 text-black" />
-//                 </button>
-//               </div>
-//             </div>
-
-//             <form className="space-y-4">
-//               <div>
-//                 <Label htmlFor="eventTitle">Event Title</Label>
-//                 <Input id="eventTitle" placeholder="Enter event title" className="bg-gray-800 border-gray-700 text-white" />
-//               </div>
-
-//               <div>
-//                 <Label htmlFor="eventDescription">Description</Label>
-//                 <Textarea id="eventDescription" placeholder="Enter event description" className="bg-gray-800 border-gray-700 text-white" />
-//               </div>
-
-//               <div className="grid grid-cols-2 gap-4">
-//                 <div>
-//                   <Label htmlFor="startDate">Start Date</Label>
-//                   <Input id="startDate" type="date" className="bg-gray-800 border-gray-700 text-white" />
-//                 </div>
-//                 <div>
-//                   <Label htmlFor="endDate">End Date</Label>
-//                   <Input id="endDate" type="date" className="bg-gray-800 border-gray-700 text-white" />
-//                 </div>
-//               </div>
-
-//               <div>
-//                 <Label htmlFor="invitedWallets">Invited Wallets</Label>
-//                 <Input id="invitedWallets" placeholder="Enter wallet addresses" className="bg-gray-800 border-gray-700 text-white" />
-//               </div>
-
-//               <div>
-//                 <Label htmlFor="votingOptions">Voting Options</Label>
-//                 <Textarea id="votingOptions" placeholder="Enter voting options (one per line)" className="bg-gray-800 border-gray-700 text-white" />
-//               </div>
-
-//               <div className="flex justify-end space-x-4">
-//                 <button
-//                   type="button"
-//                   onClick={closeDialog}
-//                   className="px-4 py-2 border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
-//                 >
-//                   Cancel
-//                 </button>
-//                 <button
-//                   type="submit"
-//                   className="px-4 py-2 bg-[#98ECFF] text-black font-semibold hover:bg-[#7DCEE0] transition-colors"
-//                 >
-//                   Create Event
-//                 </button>
-//               </div>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   )
-// }

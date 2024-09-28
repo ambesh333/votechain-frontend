@@ -31,10 +31,10 @@ const Hero = () => {
         <section className="w-full py-8 md:py-12 lg:py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link href="/organizer" passHref>
-              <div className="bg-[#09090B] border border-[#98ECFF] p-6 relative overflow-hidden group flex flex-col items-center text-center cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#98ECFF] to-[#7DCEE0] opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                <BoxIcon className="w-12 h-12 text-[#98ECFF] mb-4" />
-                <h3 className="text-xl font-bold text-[#98ECFF] mb-4">
+              <div className="bg-[#09090B] border border-[#98FB98] p-6 relative overflow-hidden group flex flex-col items-center text-center cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#98FB98] to-[#90EE90] opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <BoxIcon className="w-12 h-12 text-[#98FB98] mb-4" />
+                <h3 className="text-xl font-bold text-[#98FB98] mb-4">
                   Create an Event
                 </h3>
                 <p className="text-gray-300 mb-6">
@@ -42,16 +42,16 @@ const Hero = () => {
                   community to make decisions together. Our platform provides
                   the tools you need to get started.
                 </p>
-                <span className="inline-block bg-transparent border border-[#98ECFF] text-[#98ECFF] px-4 py-2 group-hover:bg-[#98ECFF] group-hover:text-black transition-colors duration-300">
+                <span className="inline-block bg-transparent border border-[#98FB98] text-[#98FB98] px-4 py-2 group-hover:bg-[#98FB98] group-hover:text-black transition-colors duration-300">
                   Create an Event
                 </span>
               </div>
             </Link>
             <Link href="/voter" passHref>
-              <div className="bg-[#09090B] border border-purple-500 p-6 relative overflow-hidden group flex flex-col items-center text-center cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-700 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                <CompassIcon className="w-12 h-12 text-purple-500 mb-4" />
-                <h3 className="text-xl font-bold text-purple-500 mb-4">
+              <div className="bg-[#09090B] border border-[#FFB6C1] p-6 relative overflow-hidden group flex flex-col items-center text-center cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FFB6C1] to-[#FFA07A] opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <CompassIcon className="w-12 h-12 text-[#FFB6C1] mb-4" />
+                <h3 className="text-xl font-bold text-[#FFB6C1] mb-4">
                   Cast a Vote
                 </h3>
                 <p className="text-gray-300 mb-6">
@@ -59,7 +59,7 @@ const Hero = () => {
                   vote on important issues. Our platform ensures your voice is
                   heard and your vote is secure.
                 </p>
-                <span className="inline-block bg-transparent border border-purple-500 text-purple-500 px-4 py-2 group-hover:bg-purple-500 group-hover:text-black transition-colors duration-300">
+                <span className="inline-block bg-transparent border border-[#FFB6C1] text-[#FFB6C1] px-4 py-2 group-hover:bg-[#FFB6C1] group-hover:text-black transition-colors duration-300">
                   Cast a Vote
                 </span>
               </div>

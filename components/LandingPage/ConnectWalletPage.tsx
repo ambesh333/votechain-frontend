@@ -7,7 +7,6 @@ export default function Component() {
   return (
     <div className="min-h-screen bg-background">
       {" "}
-      {/* Removed gradient */}
       <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-4xl md:text-6xl font-bold text-center mb-6">
           True Decentralized Voting
@@ -16,7 +15,7 @@ export default function Component() {
           Connect to our app and participate in secure, transparent, and
           decentralized voting powered by blockchain technology.
         </p>
-        <Card className="w-full max-w-md mb-12">
+        <Card className="w-full max-w-md mb-12 bg-transparent border-2 border-[#98ECFF]">
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold mb-4">Why Choose Us?</h2>
             <ul className="space-y-4">

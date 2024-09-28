@@ -92,7 +92,7 @@ const VotingDialog: React.FC<VotingDialogProps> = ({
         >
           <XIcon className="w-6 h-6" />
         </button>
-        <h2 className="text-2xl font-bold text-[#98ECFF] mb-4">{title}</h2>
+        <h2 className="text-2xl font-bold text-[ #FFB6C1] mb-4">{title}</h2>
         <p className="text-gray-300 mb-4">{description}</p>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
@@ -110,7 +110,7 @@ const VotingDialog: React.FC<VotingDialogProps> = ({
         </div>
         {isVotingOpen ? (
           <>
-            <div className="mb-6">
+            <div className="mb-6 border-2 border-white p-4">
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 Options
               </label>
@@ -138,7 +138,7 @@ const VotingDialog: React.FC<VotingDialogProps> = ({
               </RadioGroup>
             </div>
             <Button
-              className="w-full bg-[#98ECFF] text-black font-semibold py-2 px-4 hover:bg-[#7DCEE0] transition-colors"
+              className="w-full bg-[#98ECFF] text-black font-semibold py-2 px-4 hover:bg-[#98ECFF] transition-colors"
               onClick={handleVote}
               disabled={selectedOption === null}
             >
