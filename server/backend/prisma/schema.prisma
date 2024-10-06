@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  address       String        @unique
+  createdEvents VotingEvent[] @relation("CreatedEvents")
+}
+
+model VotingOption {
+  id         Int         @id @default(autoincrement())
+  eventId    Int
+  option     String
+  voteCount  Int         @default(0)
+  event      VotingEvent @relation("EventOptions", fields: [eventId], references: [id])
+  votedUsers Int[]
+
+  @@unique([eventId, option])
+}
+
+model VotingEvent {
+  id           Int            @id @default(autoincrement())
+  title        String
+  startDate    DateTime
+  endDate      DateTime
+  description  String?
+  options      VotingOption[] @relation("EventOptions")
+  invitedUsers String[]
+  creatorId    Int
+  creator      User           @relation("CreatedEvents", fields: [creatorId], references: [id])
+  isCompleted  Boolean        @default(false)
+}
